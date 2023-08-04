@@ -38,7 +38,7 @@ class SimpleI18N(object):
                 continue
 
             if line.startswith(b"msgid "):
-                key = line[7:-2]
+                key = line[7:-3]
                 value = b""
                 while True:
                     line = fp.readline()
@@ -48,8 +48,9 @@ class SimpleI18N(object):
 
                     if line.startswith(b"\""):
                         key += line[1:-2]
+                        xlog.info("++++++ key[1:-2]=[%s] -> [%s]", key, line)
                     elif line.startswith(b"msgstr "):
-                        value += line[8:-2]
+                        value += line[8:-3]
                         break
                     else:
                         break
@@ -62,6 +63,7 @@ class SimpleI18N(object):
 
                     if line.startswith(b"\""):
                         value += line[1:-2]
+                        xlog.info("++++++ value[1:-2]=[%s] -> [%s]", value, line)
                     else:
                         break
 
@@ -69,6 +71,7 @@ class SimpleI18N(object):
                     continue
 
                 po_dict[key] = value
+                xlog.info("++++++ po_dict[%s]=[%s]", key, value)
 
         return po_dict
 
