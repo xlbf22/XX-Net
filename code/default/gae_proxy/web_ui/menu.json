@@ -3,20 +3,24 @@
   "menu_sort_id": 1,
   "sub_menus": {
     "1":{
-      "title": "{{ _("Status") }}",
+      "title": "{{ _('Status') }}",
       "url": "status"
     },
     "2":{
-      "title": "{{ _("Configuration") }}",
+      "title": "{{ _('Configuration') }}",
       "url": "config"
     },
     "4":{
-      "title": "{{ _("Advanced") }}",
+      "title": "{{ _('Advanced') }}",
       "url": "advanced"
     },
     "5":{
-      "title": "{{ _("Log") }}",
+      "title": "{{ _('Log') }}",
       "url": "logging"
+    },
+    "6":{
+      "title": "{{ _('check_ip') }}",
+      "url": "check_ip"
     }
   }
 }

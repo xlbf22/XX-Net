@@ -55,11 +55,16 @@ i18n_translator = SimpleI18N()
 i18n_translator.add_translate(b"APP_NAME", utils.to_bytes(app_name))
 i18n_translator.add_translate(b"APP_VERSION", current_version)
 module_menus = {}
+#web服务
+server = None
 
-
+'''
+web控制器
+'''
 class Http_Handler(simple_http_server.HttpServerHandler):
     deploy_proc = None
 
+    #加载模块菜单
     def load_module_menus(self):
         global module_menus
         new_module_menus = {}
@@ -83,6 +88,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
         # for k,v in self.module_menus:
         #    xlog.debug("m:%s id:%d", k, v['menu_sort_id'])
 
+    #http协议中的OPTIONS方法
     def do_OPTIONS(self):
         try:
             origin = utils.to_str(self.headers.get(b'Origin'))
@@ -100,6 +106,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
             xlog.exception("options fail:%r", e)
             return self.send_not_found()
 
+    #http协议中的POST方法
     def do_POST(self):
         self.headers = utils.to_str(self.headers)
         self.path = utils.to_str(self.path)
@@ -163,6 +170,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
             self.send_not_found()
             xlog.info('%s "%s %s HTTP/1.1" 404 -', self.address_string(), self.command, self.path)
 
+    #http协议中的GET方法
     def do_GET(self):
         # self.headers = utils.to_str(self.headers)
         self.path = utils.to_str(self.path)
@@ -274,6 +282,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
                 self.send_not_found()
                 xlog.info('%s "%s %s HTTP/1.1" 404 -', self.address_string(), self.command, self.path)
 
+    #请求首页
     def req_index_handler(self):
         req = urlparse(self.path).query
         reqs = parse_qs(req, keep_blank_values=True)
@@ -343,6 +352,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
         data = index_content % (config.enable_gae_proxy, menu_content, right_content)
         self.send_response('text/html', data)
 
+    #请求配置页
     def req_config_handler(self):
         req = urlparse(self.path).query
         reqs = parse_qs(req, keep_blank_values=True)
@@ -581,6 +591,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
 
         self.send_response('text/html', data)
 
+    #请求更新页
     def req_update_handler(self):
         req = urlparse(self.path).query
         reqs = parse_qs(req, keep_blank_values=True)
@@ -638,6 +649,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
 
         self.send_response('text/html', data)
 
+    #请求配置代理页
     def req_config_proxy_handler(self):
         req = urlparse(self.path).query
         reqs = parse_qs(req, keep_blank_values=True)
@@ -684,6 +696,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
             data = '{"res":"success"}'
         self.send_response('text/html', data)
 
+    #请求安装APP
     def req_get_installed_app(self):
         if sys_platform.platform != 'android':
             # simulate data for developing
@@ -740,6 +753,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
 
         return self.send_response("text/html", content)
 
+    #设置代理应用列表
     def set_proxy_applist(self):
         xlog.debug("set_proxy_applist %r", self.postvars)
         config.proxy_by_app = int(self.postvars.get(b'proxy_by_app') == [b"true"])
@@ -753,6 +767,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
         }
         self.send_response("text/html", json.dumps(data))
 
+    #请求初始化模块页
     def req_init_module_handler(self):
         req = urlparse(self.path).query
         reqs = parse_qs(req, keep_blank_values=True)
@@ -778,6 +793,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
 
         self.send_response("text/html", data)
 
+    #请求日志页
     def req_log_handler(self):
         req = urlparse(self.path).query
         reqs = parse_qs(req, keep_blank_values=True)
@@ -800,6 +816,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
         mimetype = 'text/plain'
         self.send_response(mimetype, data)
 
+    #请求GC页
     def req_gc_handler(self):
         req = urlparse(self.path).query
         reqs = parse_qs(req, keep_blank_values=True)
@@ -812,6 +829,7 @@ class Http_Handler(simple_http_server.HttpServerHandler):
 
         self.send_response("text/plain", "gc collected, count:%d,%d,%d" % count)
 
+    #请求Debug页
     def req_debug_handler(self):
         global mem_stat
         req = urlparse(self.path).query
@@ -922,10 +940,6 @@ def test_proxy(type, host, port, user, passwd):
 
     return False
 
-
-server = None
-
-
 def start(allow_remote=0):
     global server
     # should use config.yaml to bind ip
@@ -973,7 +987,7 @@ def http_request(url, method="GET"):
         # xlog.exception("web_control http_request:%s fail:%s", url, e)
         return False
 
-
+#检查xxnet是否运行中
 def confirm_xxnet_not_running():
     # if xxnet is already running, try exit it
     is_xxnet_exit = False
@@ -992,7 +1006,7 @@ def confirm_xxnet_not_running():
     xlog.debug("finished confirm_xxnet_exit")
     return is_xxnet_exit
 
-
+#检查模块是否已准备完毕
 def confirm_module_ready(port):
     if port == 0:
         xlog.error("confirm_module_ready with port: 0")
@@ -1016,5 +1030,9 @@ def confirm_module_ready(port):
 
 
 if __name__ == "__main__":
+    start()
+    while True:
+        time.sleep(1)
+
     pass
     # confirm_xxnet_exit()

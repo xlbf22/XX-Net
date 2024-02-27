@@ -5,6 +5,7 @@ root_path = os.path.abspath(os.path.join(current_path, os.pardir, os.pardir, os.
 data_path = os.path.abspath(os.path.join(root_path, os.pardir, os.pardir, 'data'))
 module_data_path = os.path.join(data_path, 'x_tunnel')
 
+import traceback
 import xlog
 logger = xlog.getLogger("cloudflare_front", log_path=module_data_path, save_start_log=1500, save_warning_log=True)
 logger.set_buffer(300)
@@ -32,7 +33,8 @@ class Front(object):
         self.logger = logger
         config_path = os.path.join(module_data_path, "cloudflare_front.json")
         self.config = Config(config_path)
-
+        logger.warn("++++++ traceback.print_stack()")
+        traceback.print_stack()
         self.light_config = Config(config_path)
         self.light_config.dispather_min_idle_workers = 0
         self.light_config.dispather_min_workers = 1

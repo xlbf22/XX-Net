@@ -71,7 +71,7 @@ class SimpleI18N(object):
                     continue
 
                 po_dict[key] = value
-                xlog.info("++++++ po_dict[%s]=[%s]", key, value)
+                # xlog.info("++++++ po_dict[%s]=[%s]", key, value)
 
         return po_dict
 
